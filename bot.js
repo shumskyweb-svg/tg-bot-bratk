@@ -8,17 +8,26 @@ app.use(cors());
 app.use(express.json());
 
 
-const TOKEN = '8574660959:AAFTDSspkRCwBQhNdqL96tzhW9IICHsOQPA';
-// ID канала, на который нужно подписаться
-const CHANNEL_ID = '@bratikpiratik';
-// ID администратора
-const ADMIN_ID = 549383359; // Ваш Telegram ID
+require('dotenv').config();
+
+const TOKEN = process.env.TOKEN;
+const CHANNEL_ID = process.env.CHANNEL_ID;
+const ADMIN_ID = parseInt(process.env.ADMIN_ID);
+const DB_PATH = process.env.DB_PATH || './database/loyalty.db';
 
 // Инициализация бота
 const bot = new TelegramBot(TOKEN, { polling: true });
 
 // Инициализация базы данных
-const db = new sqlite3.Database('./loyalty.db', (err) => {
+// Ensure database directory exists
+const path = require('path');
+const fs = require('fs');
+const dbDir = path.dirname(DB_PATH);
+if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+}
+
+const db = new sqlite3.Database(DB_PATH, (err) => {
     if (err) {
         console.error('Error opening database:', err);
     } else {
